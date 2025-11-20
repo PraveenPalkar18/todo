@@ -1,0 +1,47 @@
+<!-- views/login.ejs -->
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-lg border-0 rounded-4 auth-card">
+      <div class="card-body p-4">
+        <h3 class="text-center mb-3 fw-bold">Welcome Back 👋</h3>
+        <p class="text-center text-muted small mb-4">
+          Sign in to manage your tasks in one clean dashboard.
+        </p>
+
+        <form action="/login" method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              name="email"
+              class="form-control form-control-lg"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              class="form-control form-control-lg"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button class="btn btn-primary w-100 btn-lg rounded-pill mt-2">
+            Login
+          </button>
+        </form>
+
+        <div class="text-center mt-3 small">
+          New here?
+          <a href="/register" class="fw-semibold">Create an account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

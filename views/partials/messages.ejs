@@ -1,0 +1,7 @@
+<!-- views/partials/messages.ejs -->
+<% if (message) { %>
+  <div class="alert alert-<%= message.type %> alert-dismissible fade show mt-3" role="alert">
+    <%= message.text %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>

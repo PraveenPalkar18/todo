@@ -1,0 +1,202 @@
+<!-- views/dashboard.ejs -->
+<div class="row mb-4 align-items-center">
+  <div class="col-md-8">
+    <h2 class="fw-bold">Hey, <%= userName %> 👋</h2>
+    <p class="text-muted mb-0">
+      Here’s your task board. Create, edit, mark done, or delete tasks quickly.
+    </p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <span class="badge rounded-pill bg-success-soft me-2">
+      <span class="dot dot-success me-1"></span>
+      <%= todos.filter(t => t.isCompleted).length %> done
+    </span>
+    <span class="badge rounded-pill bg-warning-soft">
+      <span class="dot dot-warning me-1"></span>
+      <%= todos.filter(t => !t.isCompleted).length %> pending
+    </span>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left: Create / Edit Form -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 rounded-4 h-100">
+      <div class="card-body">
+        <h5 class="fw-semibold mb-3">
+          Add a new task
+        </h5>
+        <form action="/todos" method="POST" class="small">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input
+              type="text"
+              name="title"
+              class="form-control"
+              placeholder="e.g. Finish Android project"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea
+              name="description"
+              class="form-control"
+              rows="2"
+              placeholder="Optional notes about this task..."
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Due Date</label>
+            <input type="date" name="dueDate" class="form-control" />
+          </div>
+
+          <button class="btn btn-primary w-100 rounded-pill">
+            Add Task
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Todo list -->
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-semibold mb-0">Your tasks</h5>
+          <div class="d-flex gap-2 small">
+            <span class="badge bg-light text-dark">Click on ✔ to toggle done</span>
+          </div>
+        </div>
+
+        <% if (todos.length === 0) { %>
+          <div class="text-center py-4 text-muted small">
+            No tasks yet. Add your first task on the left ✨
+          </div>
+        <% } else { %>
+          <div class="list-group task-list">
+            <% todos.forEach(todo => { %>
+              <div class="list-group-item border-0 border-bottom task-item d-flex align-items-start">
+                <form action="/todos/<%= todo._id %>/toggle" method="POST" class="me-3">
+                  <button class="btn btn-sm btn-outline-success rounded-circle toggle-btn">
+                    <% if (todo.isCompleted) { %>
+                      <i class="bi bi-check-lg"></i>
+                    <% } else { %>
+                      <i class="bi bi-circle"></i>
+                    <% } %>
+                  </button>
+                </form>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1 <%= todo.isCompleted ? 'text-decoration-line-through text-muted' : '' %>">
+                        <%= todo.title %>
+                      </h6>
+                      <% if (todo.description) { %>
+                        <p class="mb-1 small text-muted <%= todo.isCompleted ? 'text-decoration-line-through' : '' %>">
+                          <%= todo.description %>
+                        </p>
+                      <% } %>
+                      <div class="small text-muted d-flex gap-2 align-items-center">
+                        <span class="badge rounded-pill
+                          <%= todo.priority === 'High' ? 'bg-danger-subtle text-danger' :
+                              todo.priority === 'Low' ? 'bg-info-subtle text-info' :
+                              'bg-warning-subtle text-warning' %>">
+                          <i class="bi bi-flag-fill me-1"></i> <%= todo.priority %>
+                        </span>
+
+                        <% if (todo.dueDate) { %>
+                          <span class="text-muted">
+                            <i class="bi bi-calendar2-week me-1"></i>
+                            Due: <%= new Date(todo.dueDate).toLocaleDateString() %>
+                          </span>
+                        <% } %>
+
+                        <span>
+                          <i class="bi bi-clock-history me-1"></i>
+                          <%= new Date(todo.createdAt).toLocaleDateString() %>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="text-end ms-3 small">
+                      <!-- Edit (inline small form in dropdown) -->
+                      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="collapse"
+                        data-bs-target="#edit-<%= todo._id %>">
+                        Edit
+                      </button>
+
+                      <form action="/todos/<%= todo._id %>/delete" method="POST" class="d-inline">
+                        <button class="btn btn-sm btn-outline-danger">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <!-- Inline edit form -->
+                  <div class="collapse mt-2" id="edit-<%= todo._id %>">
+                    <form action="/todos/<%= todo._id %>/update" method="POST" class="card card-body border-0 bg-light small">
+                      <div class="row g-2">
+                        <div class="col-md-4">
+                          <input
+                            type="text"
+                            name="title"
+                            class="form-control form-control-sm"
+                            value="<%= todo.title %>"
+                            required
+                          />
+                        </div>
+                        <div class="col-md-4">
+                          <input
+                            type="text"
+                            name="description"
+                            class="form-control form-control-sm"
+                            value="<%= todo.description || '' %>"
+                          />
+                        </div>
+                        <div class="col-md-2">
+                          <select name="priority" class="form-select form-select-sm">
+                            <option value="Low" <%= todo.priority === 'Low' ? 'selected' : '' %>>Low</option>
+                            <option value="Medium" <%= todo.priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                            <option value="High" <%= todo.priority === 'High' ? 'selected' : '' %>>High</option>
+                          </select>
+                        </div>
+                        <div class="col-md-2">
+                          <input
+                            type="date"
+                            name="dueDate"
+                            class="form-control form-control-sm"
+                            value="<%= todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '' %>"
+                          />
+                        </div>
+                      </div>
+                      <div class="mt-2 text-end">
+                        <button class="btn btn-sm btn-primary rounded-pill">
+                          Save changes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
